@@ -207,7 +207,7 @@ class Cloudflare():
                 re.M | re.DOTALL
             ).groupdict()
 
-            if not all(key in formPayload for key in ['form', 'challengeUUID']):
+            if any(key not in formPayload for key in ['form', 'challengeUUID']):
                 self.cloudscraper.simpleException(
                     CloudflareIUAMError,
                     "Cloudflare IUAM detected, unfortunately we can't extract the parameters correctly."
@@ -255,7 +255,7 @@ class Cloudflare():
                 re.M | re.DOTALL
             ).groupdict()
 
-            if not all(key in formPayload for key in ['form', 'challengeUUID']):
+            if any(key not in formPayload for key in ['form', 'challengeUUID']):
                 self.cloudscraper.simpleException(
                     CloudflareCaptchaError,
                     "Cloudflare Captcha detected, unfortunately we can't extract the parameters correctly."
@@ -382,10 +382,9 @@ class Cloudflare():
             if not self.cloudscraper.delay:
                 try:
                     delay = float(
-                        re.search(
-                            r'submit\(\);\r?\n\s*},\s*([0-9]+)',
-                            resp.text
-                        ).group(1)
+                        re.search(r'submit\(\);\r?\n\s*},\s*([0-9]+)', resp.text)[
+                            1
+                        ]
                     ) / float(1000)
                     if isinstance(delay, (int, float)):
                         self.cloudscraper.delay = delay
@@ -450,35 +449,29 @@ class Cloudflare():
                     'Invalid challenge answer detected, Cloudflare broken?'
                 )
 
-            # ------------------------------------------------------------------------------- #
-            # Return response if Cloudflare is doing content pass through instead of 3xx
-            # else request with redirect URL also handle protocol scheme change http -> https
-            # ------------------------------------------------------------------------------- #
-
             if not challengeSubmitResponse.is_redirect:
                 return challengeSubmitResponse
 
-            else:
-                cloudflare_kwargs = deepcopy(kwargs)
-                cloudflare_kwargs['headers'] = updateAttr(
-                    cloudflare_kwargs,
-                    'headers',
-                    {'Referer': challengeSubmitResponse.url}
-                )
+            cloudflare_kwargs = deepcopy(kwargs)
+            cloudflare_kwargs['headers'] = updateAttr(
+                cloudflare_kwargs,
+                'headers',
+                {'Referer': challengeSubmitResponse.url}
+            )
 
-                if not urlparse(challengeSubmitResponse.headers['Location']).netloc:
-                    redirect_location = urljoin(
-                        challengeSubmitResponse.url,
-                        challengeSubmitResponse.headers['Location']
-                    )
-                else:
-                    redirect_location = challengeSubmitResponse.headers['Location']
-
-                return self.cloudscraper.request(
-                    resp.request.method,
-                    redirect_location,
-                    **cloudflare_kwargs
+            redirect_location = (
+                urljoin(
+                    challengeSubmitResponse.url,
+                    challengeSubmitResponse.headers['Location'],
                 )
+                if not urlparse(challengeSubmitResponse.headers['Location']).netloc
+                else challengeSubmitResponse.headers['Location']
+            )
+            return self.cloudscraper.request(
+                resp.request.method,
+                redirect_location,
+                **cloudflare_kwargs
+            )
 
         # ------------------------------------------------------------------------------- #
         # We shouldn't be here...

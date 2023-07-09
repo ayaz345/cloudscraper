@@ -2,11 +2,7 @@ import abc
 import logging
 import sys
 
-if sys.version_info >= (3, 4):
-    ABC = abc.ABC  # noqa
-else:
-    ABC = abc.ABCMeta('ABC', (), {})
-
+ABC = abc.ABC if sys.version_info >= (3, 4) else abc.ABCMeta('ABC', (), {})
 # ------------------------------------------------------------------------------- #
 
 captchaSolvers = {}

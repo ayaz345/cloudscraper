@@ -45,7 +45,9 @@ class ChallengeInterpreter(JavaScriptInterpreter):
             chakraCore = CDLL(chakraCoreLibrary)
         except OSError:
             sys.tracebacklimit = 0
-            raise RuntimeError('There was an error loading the ChakraCore library {}'.format(chakraCoreLibrary))
+            raise RuntimeError(
+                f'There was an error loading the ChakraCore library {chakraCoreLibrary}'
+            )
 
         if sys.platform != 'win32':
             chakraCore.DllMain(0, 1, 0)

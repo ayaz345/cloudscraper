@@ -136,10 +136,7 @@ class CloudScraper(Session):
         self.server_hostname = kwargs.pop('server_hostname', None)
         self.ssl_context = kwargs.pop('ssl_context', None)
 
-        self.allow_brotli = kwargs.pop(
-            'allow_brotli',
-            True if 'brotli' in sys.modules.keys() else False
-        )
+        self.allow_brotli = kwargs.pop('allow_brotli', 'brotli' in sys.modules.keys())
 
         self.user_agent = User_Agent(
             allow_brotli=self.allow_brotli,
@@ -303,9 +300,8 @@ class CloudScraper(Session):
                 self._solveDepthCnt += 1
 
                 response = cloudflareV1.Challenge_Response(response, **kwargs)
-            else:
-                if not response.is_redirect and response.status_code not in [429, 503]:
-                    self._solveDepthCnt = 0
+            elif not response.is_redirect and response.status_code not in [429, 503]:
+                self._solveDepthCnt = 0
 
         return response
 
