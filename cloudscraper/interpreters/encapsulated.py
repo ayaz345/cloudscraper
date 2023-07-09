@@ -11,10 +11,12 @@ def template(body, domain):
         js = re.search(
             r'setTimeout\(function\(\){\s+(.*?a\.value\s*=\s*\S+toFixed\(10\);)',
             body,
-            re.M | re.S
-        ).group(1)
+            re.M | re.S,
+        )[1]
     except Exception:
-        raise ValueError('Unable to identify Cloudflare IUAM Javascript on website. {}'.format(BUG_REPORT))
+        raise ValueError(
+            f'Unable to identify Cloudflare IUAM Javascript on website. {BUG_REPORT}'
+        )
 
     jsEnv = '''String.prototype.italics=function(str) {{return "<i>" + this + "</i>";}};
         var subVars= {{{subVars}}};
@@ -34,16 +36,16 @@ def template(body, domain):
             r"t.match(/https?:\/\//)[0];"
         )
 
-        k = re.search(r" k\s*=\s*'(?P<k>\S+)';", body).group('k')
-        r = re.compile(r'<div id="{}(?P<id>\d+)">\s*(?P<jsfuck>[^<>]*)</div>'.format(k))
+        k = re.search(r" k\s*=\s*'(?P<k>\S+)';", body)['k']
+        r = re.compile(f'<div id="{k}(?P<id>\d+)">\s*(?P<jsfuck>[^<>]*)</div>')
 
         subVars = ''
         for m in r.finditer(body):
-            subVars = '{}\n\t\t{}{}: {},\n'.format(subVars, k, m.group('id'), m.group('jsfuck'))
+            subVars = f"{subVars}\n\t\t{k}{m.group('id')}: {m.group('jsfuck')},\n"
         subVars = subVars[:-2]
 
     except:  # noqa
-        logging.error('Error extracting Cloudflare IUAM Javascript. {}'.format(BUG_REPORT))
+        logging.error(f'Error extracting Cloudflare IUAM Javascript. {BUG_REPORT}')
         raise
 
     return '{}{}'.format(

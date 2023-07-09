@@ -51,7 +51,7 @@ class Parentheses(object):
 
     def fix(self, s):
         res = []
-        self.visited = set([s])
+        self.visited = {s}
         self.dfs(s, self.invalid(s), res)
         return res
 
@@ -163,12 +163,12 @@ class ChallengeInterpreter(JavaScriptInterpreter):
             kJSFUCK = re.search(r'(;|)\s*k.=(?P<kJSFUCK>\S+);', jsfuckChallenge['challenge'], re.S | re.M)
             if kJSFUCK:
                 try:
-                    kJSFUCK = jsfuckToNumber(kJSFUCK.group('kJSFUCK'))
+                    kJSFUCK = jsfuckToNumber(kJSFUCK['kJSFUCK'])
                 except IndexError:
                     raise CloudflareSolveError('There was an issue extracting "kJSFUCK" from the Cloudflare challenge.')
 
                 try:
-                    kID = re.search(r"\s*k\s*=\s*'(?P<kID>\S+)';", body).group('kID')
+                    kID = re.search(r"\s*k\s*=\s*'(?P<kID>\S+)';", body)['kID']
                 except IndexError:
                     raise CloudflareSolveError('There was an issue extracting "kID" from the Cloudflare challenge.')
 

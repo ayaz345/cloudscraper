@@ -64,10 +64,7 @@ class captchaSolver(Captcha):
         def _checkRequest(response):
             self.checkErrorStatus(response)
 
-            if response.ok and response.json()['status'] == 'ready':
-                return True
-
-            return None
+            return True if response.ok and response.json()['status'] == 'ready' else None
 
         response = polling2.poll(
             lambda: self.session.post(
@@ -100,10 +97,7 @@ class captchaSolver(Captcha):
         def _checkRequest(response):
             self.checkErrorStatus(response)
 
-            if response.ok and response.json()['taskId']:
-                return True
-
-            return None
+            return True if response.ok and response.json()['taskId'] else None
 
         data = {
             'clientKey': self.clientKey,

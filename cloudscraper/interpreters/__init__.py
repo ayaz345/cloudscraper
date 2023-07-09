@@ -4,11 +4,7 @@ import abc
 
 from ..exceptions import CloudflareSolveError
 
-if sys.version_info >= (3, 4):
-    ABC = abc.ABC  # noqa
-else:
-    ABC = abc.ABCMeta('ABC', (), {})
-
+ABC = abc.ABC if sys.version_info >= (3, 4) else abc.ABCMeta('ABC', (), {})
 # ------------------------------------------------------------------------------- #
 
 interpreters = {}
@@ -30,11 +26,11 @@ class JavaScriptInterpreter(ABC):
     def dynamicImport(cls, name):
         if name not in interpreters:
             try:
-                __import__('{}.{}'.format(cls.__module__, name))
+                __import__(f'{cls.__module__}.{name}')
                 if not isinstance(interpreters.get(name), JavaScriptInterpreter):
                     raise ImportError('The interpreter was not initialized.')
             except ImportError:
-                logging.error('Unable to load {} interpreter'.format(name))
+                logging.error(f'Unable to load {name} interpreter')
                 raise
 
         return interpreters[name]

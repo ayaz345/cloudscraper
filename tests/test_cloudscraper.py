@@ -34,7 +34,7 @@ class TestCloudScraper:
     def test_js_challenge_27_05_2020(self, **kwargs):
         # test interpreters
         for interpreter in ['native', 'nodejs', 'js2py']:
-            print('Testing {}'.format(interpreter))
+            print(f'Testing {interpreter}')
             scraper = cloudscraper.create_scraper(interpreter=interpreter, **kwargs)
             scraper.get(url)
 

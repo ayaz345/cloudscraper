@@ -102,9 +102,7 @@ class captchaSolver(Captcha):
 
         def _checkRequest(response):
             self.checkErrorStatus(response, 'res.php')
-            if response.ok and response.json().get('status') == 1:
-                return response
-            return None
+            return response if response.ok and response.json().get('status') == 1 else None
 
         response = polling2.poll(
             lambda: self.session.get(
@@ -137,9 +135,7 @@ class captchaSolver(Captcha):
 
         def _checkRequest(response):
             self.checkErrorStatus(response, 'res.php')
-            if response.ok and response.json().get('status') == 1:
-                return response
-            return None
+            return response if response.ok and response.json().get('status') == 1 else None
 
         response = polling2.poll(
             lambda: self.session.get(

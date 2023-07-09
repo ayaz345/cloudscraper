@@ -104,10 +104,12 @@ class captchaSolver(Captcha):
         if response.text.startswith('{'):
             if response.json().get('error'):
                 raise CaptchaAPIError(error_codes.get(int(response.json().get('error'))))
-        else:
-            error_code = int(re.search(r'^00(?P<error_code>\d+)', response.text).groupdict().get('error_code', 0))
-            if error_code:
-                raise CaptchaAPIError(error_codes.get(error_code))
+        elif error_code := int(
+            re.search(r'^00(?P<error_code>\d+)', response.text)
+            .groupdict()
+            .get('error_code', 0)
+        ):
+            raise CaptchaAPIError(error_codes.get(error_code))
 
     # ------------------------------------------------------------------------------- #
 

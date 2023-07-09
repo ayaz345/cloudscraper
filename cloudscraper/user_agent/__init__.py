@@ -24,12 +24,12 @@ class User_Agent():
     def filterAgents(self, user_agents):
         filtered = {}
 
-        if self.mobile:
-            if self.platform in user_agents['mobile'] and user_agents['mobile'][self.platform]:
-                filtered.update(user_agents['mobile'][self.platform])
+        if self.platform in user_agents['mobile'] and user_agents['mobile'][self.platform]:
+            if self.mobile:
+                filtered |= user_agents['mobile'][self.platform]
 
-        if self.desktop:
-            if self.platform in user_agents['desktop'] and user_agents['desktop'][self.platform]:
+        if self.platform in user_agents['desktop'] and user_agents['desktop'][self.platform]:
+            if self.desktop:
                 filtered.update(user_agents['desktop'][self.platform])
 
         return filtered
